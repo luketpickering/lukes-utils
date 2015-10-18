@@ -78,22 +78,15 @@ std::vector<std::string> SplitStringByDelim(std::string const &inp,
   size_t prevOccurence = 0;
   std::vector<std::string> outV;
   bool AtEnd = false;
-  // std::cout << inp << std::endl;
   while(!AtEnd){
-    // std::cout << "[SplitStringByDelim] prevOccurence: " << prevOccurence << std::endl;
     nextOccurence = inp.find_first_of(delim,prevOccurence);
-    // std::cout << "[SplitStringByDelim] nextOccurence: " <<
-      // ((nextOccurence == std::string::npos)?-1:nextOccurence) << std::endl;
     if(nextOccurence == std::string::npos){
       if(prevOccurence == inp.length()){
-        // std::cout << "[SplitStringByDelim] Found trailing delimiter." << std::endl;
         break;
       }
       AtEnd = true;
     }
     outV.push_back(inp.substr(prevOccurence,(nextOccurence-prevOccurence)));
-    // std::cout << "[SplitStringByDelim] Added string: " << outV.back()
-      // << std::endl;
     prevOccurence = nextOccurence+1;
   }
   return outV;
