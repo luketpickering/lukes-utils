@@ -6,6 +6,15 @@
 
 #include <vector>
 #include <iostream>
+#include <stdexcept>
+
+namespace CLIArgs {
+  void AddHelp();
+
+  struct EDuplicateOption : public std::invalid_argument {
+    EDuplicateOption(std::string const &arg) : std::invalid_argument(arg){}
+  };
+}
 
 namespace CLIArgs {
 
@@ -74,7 +83,7 @@ void SayRunLike();
 ///Attempts to get an option by either ShortName or LongName.
 ///
 ///Returns a default option if none is found.
-Option GetOpt(std::string const &profopt);
+Option& GetOpt(std::string const &profopt);
 
 ///IMPLEMENTATION:Function which adds a new option to the list of known options.
 ///
@@ -90,6 +99,9 @@ void _PushOption(Option &&opt);
 ///returns true if option was added.
 template<class ... Args>
 bool AddOpt(Args... args){
+
+  AddHelp();
+
   Option newopt(args...);
 
   if(!!GetOpt(newopt.ShortName) || !!GetOpt(newopt.LongName)){
@@ -97,11 +109,16 @@ bool AddOpt(Args... args){
     " the " << ((!!GetOpt(newopt.ShortName))?" Short name: " + newopt.ShortName:
                                              " Long name: " + newopt.LongName)
     << " is already in use by: " << GetOpt(newopt.LongName) << std::endl;
-    return false;
+    throw EDuplicateOption(std::string("Option: ")
+      + ((!!GetOpt(newopt.ShortName))?" Short name: " + newopt.ShortName:
+                                      " Long name: " + newopt.LongName)
+      + " is already in use.");
   }
   _PushOption(std::move(newopt));
   return true;
 }
+
+void AddHelp();
 
 }
 #endif

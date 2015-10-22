@@ -6,6 +6,7 @@
 
 namespace CLIArgs {
 std::vector<Option> OptSpec;
+Option EmptyOption;
 std::vector<std::string> Args;
 
 Option::Option(){
@@ -69,26 +70,17 @@ std::ostream& operator<<(std::ostream& os, Option const &opt){
     << (opt.Required?" [Required]":"");
 }
 
-Option GetOpt(std::string const &profopt){
+Option& GetOpt(std::string const &profopt){
   for(auto &opt : OptSpec){
     if(!opt.IsOpt(profopt)) {
       continue;
     }
     return opt;
   }
-  return Option();
-}
-
-void AddHelp(){
-  AddOpt("-h","--help", false,
-  [&] (std::string const &opt) -> bool {
-    SayRunLike();
-    exit(0);
-  });
+  return EmptyOption;
 }
 
 void AddArguments(int argc, char const * argv[]){
-  AddHelp();
   for(int i = 0; i < argc; ++i){
     Args.emplace_back(argv[i]);
   }
@@ -96,7 +88,6 @@ void AddArguments(int argc, char const * argv[]){
 
 void AddArgumentsAndGetUnexpecteds(int argc, char * argv[], int& retArgc,
   char ** &retArgv){
-  AddHelp();
   std::set<int> Unexpecteds;
   //The first argument is the invocation command, we always want this.
   Args.emplace_back(argv[0]);
@@ -128,7 +119,6 @@ void AddArgumentsAndGetUnexpecteds(int argc, char * argv[], int& retArgc,
 
 bool HandleArgs(){
   bool skipNextArg = false;
-
   for(auto arg_it = std::next(Args.cbegin());
     arg_it < Args.cend(); std::advance(arg_it,1)){
 
@@ -136,7 +126,7 @@ bool HandleArgs(){
 
     std::string const & arg = *arg_it;
 
-    Option opt = GetOpt(arg);
+    Option& opt = GetOpt(arg);
 
     if(!opt){
       std::cout << "Unexpected Option: " << arg << std::endl;
@@ -180,7 +170,8 @@ bool HandleArgs(){
   [] (bool const &acc, Option const & opt) -> bool {
     if(!acc){ return acc; }
     if(opt.Required && !opt.Used){
-      std::cout << "Didn't find an option for " << opt.LongName << std::endl;
+      std::cout << "Didn't find an option for (" << opt.ShortName << "|"
+        << opt.LongName << ")" << std::endl;
       return false;
     }
     return true;
@@ -213,6 +204,20 @@ void SayRunLike(){
 
 void _PushOption(Option &&opt){
   OptSpec.push_back( std::move(opt) );
+}
+
+void AddHelp(){
+  static bool Added = false;
+  if(Added){
+    return;
+  }
+
+  OptSpec.emplace_back("-h","--help", false,
+  [&] (std::string const &opt) -> bool {
+    SayRunLike();
+    exit(0);
+  }, false, [](){}, "Print this message.");
+  Added = true;
 }
 
 }
