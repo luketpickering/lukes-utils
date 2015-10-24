@@ -27,5 +27,11 @@ tests: UtilsTests.cxx $(TOBJH) $(TOBJS) $(TARGET)
 $(TARGET): $(TOBJS) $(TOBJH)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(TOBJS) -o $@
 
+libCLITools.a: CLITools.cxx CLITools.hxx
+	$(CXX) $(CXXFLAGS) -c CLITools.cxx -o CLITools.o
+	mkdir -p $(LDIR)
+	ar rcs $@ CLITools.o
+	mv $@ $(LDIR)/
+	rm CLITools.o
 clean:
-	rm -rf $(TARGET) UtilsTests.exe $(LDIR)
+	rm -rf $(TARGET) UtilsTests.exe $(LDIR) ./*o
