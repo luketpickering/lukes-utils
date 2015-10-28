@@ -72,7 +72,7 @@ bool str2bool(std::string const &str){
 }
 
 std::vector<std::string> SplitStringByDelim(std::string const &inp,
-  char const *delim){
+  char const *delim, bool PushEmpty){
 
   size_t nextOccurence = 0;
   size_t prevOccurence = 0;
@@ -86,7 +86,9 @@ std::vector<std::string> SplitStringByDelim(std::string const &inp,
       }
       AtEnd = true;
     }
-    outV.push_back(inp.substr(prevOccurence,(nextOccurence-prevOccurence)));
+    if(PushEmpty || (nextOccurence != prevOccurence)){
+      outV.push_back(inp.substr(prevOccurence,(nextOccurence-prevOccurence)));
+    }
     prevOccurence = nextOccurence+1;
   }
   return outV;

@@ -89,7 +89,7 @@ T** NewPPOf2DArray(T (&arr)[N][M]){
 }
 
 std::vector<std::string> SplitStringByDelim(std::string const &inp,
-  char const *delim);
+  char const *delim, bool PushEmpty=false);
 std::vector<float> StringVToFloatV(
   std::vector<std::string> const &stringV);
 

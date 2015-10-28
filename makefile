@@ -5,33 +5,34 @@ LDIR :=lib
 CXXFLAGS := -fPIC $(ROOTCFLAGS) -g -std=c++11 -Wall
 LDFLAGS := $(ROOTLDFLAGS) -Wl,-rpath=.
 
-TOBJS := CLITools.cxx PureGenUtils.cxx
-TOBJH := $(TOBJS:.cxx=.hxx)
+SRCF := CLITools.cxx PureGenUtils.cxx
+HF := $(SRCF:.cxx=.hxx)
+OBJ := $(SRCF:.cxx=.o)
 
-TARGET := libPureGenUtils.so
+TARGETSO := libPureGenUtils.so
+TARGET := libPureGenUtils.a
 
 .PHONEY: all clean
 
 all: tests
 	./UtilsTests.exe
-	mkdir -p $(LDIR)
-	mv $(TARGET) $(LDIR)
 	@echo ""
 	@echo "*********************************************************************"
 	@echo "Success. Built Utils."
 	@echo "*********************************************************************"
 
-tests: UtilsTests.cxx $(TOBJH) $(TOBJS) $(TARGET)
-	$(CXX) -o UtilsTests.exe $(CXXFLAGS) $(LDFLAGS) $(TARGET) UtilsTests.cxx
+tests: UtilsTests.cxx $(HF) $(SRCF) $(LDIR)/$(TARGET)
+	$(CXX) -o UtilsTests.exe  UtilsTests.cxx $(CXXFLAGS) $(LDFLAGS) -L$(LDIR) -lPureGenUtils
 
-$(TARGET): $(TOBJS) $(TOBJH)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(TOBJS) -o $@
+%.o : %.cxx $(HF)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-libCLITools.a: CLITools.cxx CLITools.hxx
-	$(CXX) $(CXXFLAGS) -c CLITools.cxx -o CLITools.o
+$(LDIR)/$(TARGET): $(OBJ)
 	mkdir -p $(LDIR)
-	ar rcs $@ CLITools.o
-	mv $@ $(LDIR)/
-	rm CLITools.o
+	ar rcs $@ $^
+
+$(TARGETSO): $(SRCF) $(HF)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(SRCF) -o $@
+
 clean:
-	rm -rf $(TARGET) UtilsTests.exe $(LDIR) ./*o
+	rm -rf UtilsTests.exe $(LDIR) ./*o
