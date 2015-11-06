@@ -81,16 +81,18 @@ Option& GetOpt(std::string const &profopt){
 }
 
 void AddArguments(int argc, char const * argv[]){
-  for(int i = 0; i < argc; ++i){
+  for(int i = Args.size()?1:0; i < argc; ++i){
     Args.emplace_back(argv[i]);
   }
 }
 
-void AddArgumentsAndGetUnexpecteds(int argc, char * argv[], int& retArgc,
-  char ** &retArgv){
+void AddArgumentsAndGetUnexpecteds(int argc, char const * argv[], int& retArgc,
+  char const ** &retArgv){
   std::set<int> Unexpecteds;
   //The first argument is the invocation command, we always want this.
-  Args.emplace_back(argv[0]);
+  if(!Args.size()){
+    Args.emplace_back(argv[0]);
+  }
   for(int i = 1; i < argc; ++i){
 
     Option const & opt = GetOpt(argv[i]);
@@ -106,7 +108,7 @@ void AddArgumentsAndGetUnexpecteds(int argc, char * argv[], int& retArgc,
     }
   }
   //Anyone else will also, likely, always want this.
-  retArgv = new char *[Unexpecteds.size()+1];
+  retArgv = new char const *[Unexpecteds.size()+1];
   retArgc = 1;
   retArgv[0] = argv[0];
 

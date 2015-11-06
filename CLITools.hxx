@@ -66,8 +66,8 @@ void AddArguments(int argc, char const * argv[]);
 ///
 ///\note The zeroth entry of argv is added to both the internal argument list
 /// and the returned array of unexpecteds.
-void AddArgumentsAndGetUnexpecteds(int argc, char * argv[], int& retArgc,
-  char ** &retArgv);
+void AddArgumentsAndGetUnexpecteds(int argc, char const * argv[], int& retArgc,
+  char const ** &retArgv);
 
 ///Invokes options for found arguments and defaults for unused options.
 bool HandleArgs();
