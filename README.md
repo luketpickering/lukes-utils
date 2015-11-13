@@ -1,4 +1,8 @@
-# lukes-utils
+# lukes-utils-deprecated
+
+WARNING: this is a legacy repo, point remotes to git@git.ursaminorbeta.org.uk:luketpickering/lukes-utils.git
+============================================================================================================
+
 Some common utils that will be used between projects.
 
 
